@@ -1,3 +1,35 @@
+
+ # Python program to read
+# image using PIL module
+ 
+# importing PIL
+from PIL import Image
+ 
+# Read image
+# img = Image.open('mona_lisa.jpg')
+ 
+# # Output Images
+# img.show()
+ 
+# # prints format of image
+# print(img.format)
+ 
+# # prints mode of image
+# print(img.mode)
+# # data = list(img.getdata())
+# # for i in data:
+# #     print("row",i)
+    
+    
+# pixels = list(img.getdata())
+# width, height = img.size
+# pixels = [pixels[i * width:(i + 1) * width] for i in range(height)]
+
+# for i in pixels:
+#     print("row",i)
+# print("data:",data)
+
+
 import random
 import math
 
@@ -23,7 +55,7 @@ def permutation(lst):
 class EA:
     def __init__(self, size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1, tournament_size = 2, data = {1:(1,1)}):
         self.data = data
-        self.cities = []
+        self.image = list()
         self.size = size
         self.population = {}
         self.generation = generations
@@ -34,23 +66,45 @@ class EA:
         self.parent_scheme = parent_scheme
         self.surviver_scheme = surviver_scheme
         self.tournament_size = tournament_size
+        
 
     def get_data(self, file):
-        data = {}
-        cities = []
-        f = open(file, "r")
-        l = 1
-        for x in f:
-            if x == "EOF":
-                break
-            if l > 7:
-                info = x.split(" ")
-                data[int(info[0])] = (float(info[1]),float(info[2]))
-                cities.append(int(info[0]))
-            l+=1
-        self.cities = cities
-        self.data = data
+        
+        img = Image.open(file)
+ 
+        img.show()
+ 
+        print(img.format)
+ 
+        print(img.mode)    
+    
+        pixels = list(img.getdata())
+        width, height = img.size
+        pixels = [pixels[i * width:(i + 1) * width] for i in range(height)]
+
+        self.image = pixels
+        
         return self.data
+    
+    def area(x1, y1, x2, y2, x3, y3):
+         
+        return abs((x1 * (y2 - y3) + x2 * (y3 - y1) 
+                + x3 * (y1 - y2)) / 2.0)
+        
+    def is_in(self, point, triangle):
+        
+        A = self.area(triangle[0][0], triangle[0][1], triangle[1][0], triangle[1][1], triangle[2][0], triangle[2][1])
+        
+        A1 = self.area(point[0], point[1], triangle[1][0], triangle[1][1], triangle[2][0], triangle[2][1])
+
+        A2 = self.area(triangle[0][0], triangle[0][1], point[0], point[1], triangle[2][0], triangle[2][1])
+        
+        A3 = self.area(triangle[0][0], triangle[0][1], triangle[1][0], triangle[1][1], point[0], point[1])
+
+        if(A == A1 + A2 + A3):
+            return True
+        else:
+            return False
     
     def compute_fitness(self,ind):
         total = 0 
@@ -445,52 +499,10 @@ class EA:
                 self.survivers_truncation()
             else:
                 self.survivers_random_selection()
-            # for o in range(self.offsprings):
-            #     parent_1 = self.ranked()
-            #     parent_2 = self.fitness_proportional()
-            #     child =  self.crossover(parent_1, parent_2)
-            #     self.population[child] = self.compute_fitness(child)
             
-            # new = {}
-            # for t in range(self.size):
-            #     surviver = self.truncation()
-            #     new[surviver] = self.population[surviver]
-            # self.population = new
             
         self.best()
         
-        
-            
-                
-        
-        
-# size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1
-    
-        
-test = EA(size = 100, generations = 100, offsprings =  20, rate = 0.5, mutation = 1, parent_scheme = 2, surviver_scheme = 2, tournament_size= 10)
-# test.get_data("qa194.tsp")
-# test.evolution()
 
-test.get_data("test.tsp")
-# test.tsp_brute_force()
-test.evolution()
 
-# current = 100
-# num = random.randint(0, math.floor(current))
-# print(num)
-# num = random.randint(0, math.floor(current))
-# print(num)
-# num = random.randint(0, math.floor(current))
-# print(num)
-
-# evol = EA(size = 5)
-# evol.get_data("qa194.tsp")
-# # print(evol.data)
-# evol.initialize_population()
-# for i in evol.population:
-#     print(i)
-# print(evol.population)
-# pop = {(1):2,(2):5,(3):4,(4):7,(5):6}
-
-# sor = sorted(pop.keys(), key=lambda x: pop[x])
-# print(sor)
+ 
