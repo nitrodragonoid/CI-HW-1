@@ -1,5 +1,6 @@
 import random
 import math
+from numpy.random import choice   
 
 def permutation(lst):
     
@@ -87,43 +88,61 @@ class EA:
     
     # selection schemes
     def fitness_proportional(self):
-        sum = 0
+        
+        total_weight = 0
         for ind in self.population:
-            sum += 1/self.population[ind]
-        wheel = {}
-        current = 0
-        for i in self.population:
-            per = math.floor(100 * ((1/self.population[i])/sum))
-            wheel[(current,current+per)] = i
-            current+=per
-        # print(wheel)
+            total_weight += 1/self.population[ind]
             
-        num = random.randint(0, math.floor(current))
+        individuals =  list(self.population.keys())
         
-        for ran in wheel:
-            if num >= ran[0] and num <= ran[1]:
-                return wheel[ran]
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
         
-        r = random.randint(0, len(self.population)-1)
-        return self.population.keys()[r]
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
+        win = choice(c, 1, p=relative_fitness)
+
+        return individuals[win[0]]
+    
     
     def ranked(self):
+        
         pop = self.population.copy()
         sor = sorted(pop.keys(), key=lambda x: pop[x])
         sor.reverse()
         
-        ranks = {}
-        current = 0
-        for i in range(1,len(sor)-1):
-            ranks[(current,current+ i)] = sor[i]
-            current+= i
-        num = random.randint(0, math.floor(current))
+        individuals =  list(self.population.keys())
         
-        for ran in ranks:
-            if num >= ran[0] and num <= ran[1]:
-                return ranks[ran]
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [i/total_weight for i in c]
+        
+        win = choice(c, 1, p=relative_fitness)
+
+        return individuals[win[0]]
+        # pop = self.population.copy()
+        # sor = sorted(pop.keys(), key=lambda x: pop[x])
+        # sor.reverse()
+        
+        # ranks = {}
+        # current = 0
+        # for i in range(1,len(sor)-1):
+        #     ranks[(current,current+ i)] = sor[i]
+        #     current+= i
+        # num = random.randint(0, math.floor(current))
+        
+        # for ran in ranks:
+        #     if num >= ran[0] and num <= ran[1]:
+        #         return ranks[ran]
             
-        return sor[0]
+        # return sor[0]
     
     def tournament(self, size):
         participants = {}
@@ -155,31 +174,26 @@ class EA:
     
     # selection schemes for parents selection 
     def create_offsprings_fitness_proportional(self):
-        sum = 0
-        for ind in self.population:
-            sum += 1/self.population[ind]
-        wheel = {}
-        current = 0
-        for i in self.population:
-            per = math.floor(100 * ((1/self.population[i])/sum))
-            wheel[(current,current+per)] = i
-            current+=per
-        # print(wheel)
             
+        total_weight = 0
+        for ind in self.population:
+            total_weight += 1/self.population[ind]
+            
+        individuals =  list(self.population.keys())
+                
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
         
         for o in range(self.offsprings):
             
-            num = random.randint(0, math.floor(current))
-            
-            for ran in wheel:
-                if num >= ran[0] and num <= ran[1]:
-                    parent_1 = wheel[ran]
-                    
-            num = random.randint(0, math.floor(current))
-            
-            for ran in wheel:
-                if num >= ran[0] and num <= ran[1]:
-                    parent_2 = wheel[ran]
+            win = choice(c, 1, p=relative_fitness)
+            parent_1 = individuals[win[0]]
+            win = choice(c, 1, p=relative_fitness)
+            parent_2 = individuals[win[0]]
             
             if self.mutation == 1:                    
                 child =  self.swap_mutation(self.crossover(parent_1, parent_2))
@@ -194,30 +208,48 @@ class EA:
         sor = sorted(pop.keys(), key=lambda x: pop[x])
         sor.reverse()
         
-        ranks = {}
-        current = 0
-        for i in range(len(sor)):
-            ranks[(current,current+ i+1)] = sor[i]
-            current+= i
+        # ranks = {}
+        # current = 0
+        # for i in range(len(sor)):
+        #     ranks[(current,current+ i+1)] = sor[i]
+        #     current+= i
+        
+        individuals =  list(self.population.keys())
+        
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness = [(i+1)/total_weight for i in c]
         
         
         for o in range(self.offsprings):
-            num = random.randint(0, math.floor(current))
             
-            parent_1 = list(self.population.keys())[0]
-            parent_2 = list(self.population.keys())[0]
-            for ran in ranks:
-                if num >= ran[0] and num <= ran[1]:
-                    parent_1 = ranks[ran]
-                    # print(parent_1)
-                    break
+            win = choice(c, 1, p=relative_fitness)
+            parent_1 = individuals[win[0]]
+            
+            win = choice(c, 1, p=relative_fitness)
+            parent_2 = individuals[win[0]]
+            # num = random.randint(0, math.floor(current))
+            
+            # parent_1 = list(self.population.keys())[0]
+            # parent_2 = list(self.population.keys())[0]
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         parent_1 = ranks[ran]
+            #         # print(parent_1)
+            #         break
                     
-            num = random.randint(0, math.floor(current))
+            # num = random.randint(0, math.floor(current))
         
-            for ran in ranks:
-                if num >= ran[0] and num <= ran[1]:
-                    parent_2 = ranks[ran]
-                    break
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         parent_2 = ranks[ran]
+            #         break
                 
             if self.mutation == 1:                    
                 child =  self.swap_mutation(self.crossover(parent_1, parent_2))
@@ -271,26 +303,47 @@ class EA:
 
     # selection schemes for surviver selection
     def survivers_fitness_proportional(self):
-        sum = 0
-        for ind in self.population:
-            sum += 1/self.population[ind]
-        wheel = {}
-        current = 0
-        for i in self.population:
-            per = math.floor(100 * ((1/self.population[i])/sum))
-            wheel[(current,current+per)] = i
-            current+=per
+        # sum = 0
+        # for ind in self.population:
+        #     sum += 1/self.population[ind]
+        # wheel = {}
+        # current = 0
+        # for i in self.population:
+        #     per = math.floor(100 * ((1/self.population[i])/sum))
+        #     wheel[(current,current+per)] = i
+        #     current+=per
         # print(wheel)
+        
+        total_weight = 0
+        for ind in self.population:
+            total_weight += 1/self.population[ind]
             
-        num = random.randint(0, math.floor(current))
+        individuals =  list(self.population.keys())
+        
+        # relative_fitness = [(1/self.population[i])/total_weight for i in individuals]
+            
+        # num = random.randint(0, math.floor(current))
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
+        win = choice(c, 1, p=relative_fitness)
+
         
         new = {}
         
         for s in range(self.generation):
-        
-            for ran in wheel:
-                if num >= ran[0] and num <= ran[1]:
-                    new[wheel[ran]] = self.population[wheel[ran]]
+            
+            win = choice(c, 1, p=relative_fitness)
+            
+            sur = individuals[win[0]]
+            new[sur] = self.population[sur]
+            # for ran in wheel:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         new[wheel[ran]] = self.population[wheel[ran]]
         
         self.population = new
         return self.population
@@ -300,20 +353,39 @@ class EA:
         sor = sorted(pop.keys(), key=lambda x: pop[x])
         sor.reverse()
         
-        ranks = {}
-        current = 0
-        for i in range(len(sor)):
-            ranks[(current,current+ i+1)] = sor[i]
-            current+= i
-        num = random.randint(0, math.floor(current))
+        # ranks = {}
+        # current = 0
+        # for i in range(len(sor)):
+        #     ranks[(current,current+ i+1)] = sor[i]
+        #     current+= i
+        # num = random.randint(0, math.floor(current))
+        
+        individuals =  list(self.population.keys())
+        
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness = [(i+1)/total_weight for i in c]
         
         new = {}
         
         for s in range(self.generation):
+            
+            win = choice(c, 1, p=relative_fitness)
+            
+            sur = individuals[win[0]]
+            new[sur] = self.population[sur]
+            # win = choice(c, 1, p=relative_fitness)
+            # parent_1 = individuals[win[0]]
         
-            for ran in ranks:
-                if num >= ran[0] and num <= ran[1]:
-                    new[ranks[ran]] = self.population[ranks[ran]]
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         new[ranks[ran]] = self.population[ranks[ran]]
         
         self.population = new
         return self.population
@@ -415,7 +487,7 @@ class EA:
     def evolution(self):
         self.initialize_population()
         for g in range(self.generation):
-            # print(g)
+            print(g)
             # print(self.population)
             
             # best_ind = self.truncation()
@@ -467,11 +539,11 @@ class EA:
 # size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1
     
         
-test = EA(size = 100, generations = 100, offsprings =  20, rate = 0.5, mutation = 1, parent_scheme = 2, surviver_scheme = 2, tournament_size= 10)
-# test.get_data("qa194.tsp")
+test = EA(size = 100, generations = 100, offsprings =  20, rate = 0.5, mutation = 1, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+test.get_data("qa194.tsp")
 # test.evolution()
 
-test.get_data("test.tsp")
+# test.get_data("test.tsp")
 # test.tsp_brute_force()
 test.evolution()
 
