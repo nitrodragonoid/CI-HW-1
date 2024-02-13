@@ -1,6 +1,9 @@
 import random
 import math
 from numpy.random import choice   
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def permutation(lst):
     
@@ -83,6 +86,9 @@ class EA:
         for j in range(len(parent_2)):
             if parent_2[j] not in ind:
                 ind.append(parent_2[j])
+        if len(ind) != len(parent_1):
+            print("error")
+            return False
         
         return tuple(ind)
     
@@ -531,21 +537,34 @@ class EA:
             
         self.best()
         
+    def test(self,k):
+        fitprop = [[0]*k]*40
         
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_fitness_proportional()
+
+                self.survivers_fitness_proportional()
+                
+
+            
+            
             
                 
-        
+
         
 # size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1
     
         
-test = EA(size = 100, generations = 100, offsprings =  20, rate = 0.5, mutation = 1, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
-test.get_data("qa194.tsp")
-# test.evolution()
+Test = EA(size = 100, generations = 1000, offsprings =  20, rate = 0.5, mutation = 1, parent_scheme = 1, surviver_scheme = 4, tournament_size= 10)
+Test.get_data("qa194.tsp")
+Test.evolution()
 
-# test.get_data("test.tsp")
-# test.tsp_brute_force()
-test.evolution()
+# # test.get_data("test.tsp")
+# # test.tsp_brute_force()
+# Test.evolution()
 
 # current = 100
 # num = random.randint(0, math.floor(current))
@@ -566,3 +585,6 @@ test.evolution()
 
 # sor = sorted(pop.keys(), key=lambda x: pop[x])
 # print(sor)
+
+# l = [[0]*10]*10
+# print(l)
