@@ -1,352 +1,663 @@
-import numpy as np
 import random
 import math
+from numpy.random import choice   
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def permutation(lst):
+    
+    if len(lst) == 0:
+        return []
  
-def initialization(file_path): #Problem Formulation
-    result_dict = {}
-    first_line_tuples = None
-   
-    with open(file_path, 'r') as file:
-        first_line_skipped = False
-       
-        for line in file:
-            if not first_line_skipped:
-                values = line.strip().split()  
-                first_line_tuples = [(int(values[i]), int(values[i+1])) for i in range(0, len(values)-1, 2)]
-               
-                first_line_skipped = True
-                continue
-           
-            values = line.strip().split()  
-            tuples = [(int(values[i]), int(values[i+1])) for i in range(0, len(values)-1, 2)]
-            result_dict[len(result_dict)] = tuples
-   
+    if len(lst) == 1:
+        return [lst]
  
  
-# file_path = r'C:\Users\Student\OneDrive - Habib University\Sem 8\CI\abz5.txt'
-    x = first_line_tuples
-    jsspdata = result_dict
+    l = [] 
+    for i in range(len(lst)):
+       m = lst[i]
  
-    if x is not None:
-        no_of_jobs = x[0][0]
-        # print(no_of_jobs)
-        no_of_machines = x[0][1]
-        # print(no_of_machines)
-    # print(jsspdata)
+       remLst = lst[:i] + lst[i+1:]
  
- 
-    #Dataset:abz5  
- 
-    #jobs_list
-    population = {}
- 
-    for i in range(30):
- 
-        operations = []
-        machines_current_times = []
-        for i in range(no_of_jobs):
-            operations.append(0)
-        # print(operations)
-        for i in range(no_of_machines):
-            machines_current_times.append(0)
- 
-        # print(machines_current_times)
- 
-        Machines_operating_times = []
- 
-        for i in range(no_of_machines):
-            Machines_operating_times.append([])
-        prev_operations_time = []
-        for i in range(no_of_machines):
-            prev_operations_time.append(0)
- 
-        completed_jobs = 0
- 
-        while (completed_jobs<no_of_jobs):
-            job = random.randint(0,no_of_jobs-1)
- 
-            while operations[job] == no_of_machines:
-                job = random.randint(0,no_of_jobs-1)
- 
-            operation = operations[job]
-            curr_job = jsspdata[job]
-            machine_num = curr_job[operation][0]
-            time_for_operation = curr_job[operation][1]
-            start_time = max(prev_operations_time[job],machines_current_times[job])
-            end_time = start_time + time_for_operation
-            machines_current_times[machine_num] = end_time
-            prev_operations_time[job] = end_time
- 
-            operations[job]+=1
-            if operations[job] == no_of_machines:
-                completed_jobs += 1
- 
-            Machines_operating_times[machine_num].append((job,operation,start_time,end_time))
-        Machines_operating_times_tuple = []
-        for i in Machines_operating_times:
-            Machines_operating_times_tuple.append(tuple(i))
-        
-        # print(Machines_operating_times)
-        Machines_operating_times=tuple(Machines_operating_times_tuple)
-        # print(Machines_operating_times)
-        # return True
-        population[tuple(Machines_operating_times)] = fitness_computation(Machines_operating_times)
-    return population
- 
- 
-def fitness_computation(individual):        
-    # fitness_value=[]
-    # for i in population:
-    #     print(i)
+       for p in permutation(remLst):
+           l.append([m] + p)
+    return l
+
+class EA:
+    def __init__(self, size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1, tournament_size = 2, data = {1:(1,1)}):
+        self.data = data
+        self.cities = []
+        self.size = size
+        self.population = {}
+        self.generation = generations
+        self.offsprings = offsprings
+        self.mutation_rate = rate
+        self.iterations = iteration
+        self.mutation = mutation 
+        self.parent_scheme = parent_scheme
+        self.surviver_scheme = surviver_scheme
+        self.tournament_size = tournament_size
+
+    def get_data(self, file):
+        data = {}
+        cities = []
+        f = open(file, "r")
+        l = 1
+        for x in f:
+            if x == "EOF":
+                break
+            if l > 7:
+                info = x.split(" ")
+                data[int(info[0])] = (float(info[1]),float(info[2]))
+                cities.append(int(info[0]))
+            l+=1
+        self.cities = cities
+        self.data = data
+        return self.data
+    
+    def compute_fitness(self,individual):
         all_machine_times=[]
+        # if type(individual) == int():
+        # print(type(individual),individual)
         for j in range(len(individual)):
+            # print(j)
             machine_max_time = individual[j][-1][3]
             all_machine_times.append(machine_max_time)
         y =  max(all_machine_times)
         return y
-       
- 
-#     return fitness_value
- 
-# file_path = r'C:\Users\Student\OneDrive - Habib University\Sem 8\CI\abz5.txt'
-file_path = r'abz5.txt'
 
-jssp_data = initialization(file_path)
-print(jssp_data)
- 
-# # def parent_selection(population,scheme,fitness,parent_size):
-# #     if scheme == "Truncation":
-# #         parents=[]
-# #         fit = np.argsort(fitness)
-# #         for i in range(parent_size):
-# #             x = fit[i]
-# #             parents.append(population[x])
-# #         return parents
- 
- 
-   
-# def crossover(parents,offspring_size,no_of_machines):
- 
-#     offspring=[]
-#     for i in range(len(parents)):
-#         par1 = parents[i]
-#         par2 = parents[i+1]
-#         child_dict = {}
-#         random = []
-#         for i in range(5):
-#             random.append(random.randint(0,no_of_machines-1))
-#         for j in par1:
-#             if j in random:
-#                 child_dict[j] = (par1[j]).copy()
-#             else:
-#                 child_dict[j] = (par2[j]).copy()
-#         offspring.append(child_dict)
-   
- 
-# # mutation schemes
-#     def swap_mutation(individual,mutation_rate):
-#         r = random.randint(0,100)
-#         num = 100 * mutation_rate
-#         mutated = list(individual)
-#         if r <= num:
-#             i = random.randint(0,len(mutated)-1)
-#             j = random.randint(0,len(mutated)-1)
-#             temp = mutated[i]
-#             mutated[i] = mutated[j]
-#             mutated[j] = temp
-           
-#         return tuple(mutated)
-   
-#     def best(population):
-#         winner = list(population.keys())[0]
-#         min = math.inf
-#         for i in population:
-#             if population[i] < min:
-#                 min = population[i]
-#                 winner = i
-       
-#         print(winner)
-#         print(min)
-#         return winner,min
- 
-# # selection schemes
-#     def fitness_proportional(population):
-#         sum = 0
-#         for ind in population:
-#             sum += 1/population[ind]
-#         wheel = {}
-#         current = 0
-#         for i in population:
-#             per = math.floor(100 * ((1/population[i])/sum))
-#             wheel[(current,current+per)] = i
-#             current+=per
-#         # print(wheel)
-           
-#         num = random.randint(0, math.floor(current))
-       
-#         for ran in wheel:
-#             if num >= ran[0] and num <= ran[1]:
-#                 return wheel[ran]
-       
-#         r = random.randint(0, len(population)-1)
-#         return population.keys()[r]
-   
-#     def ranked(population):
-#         pop = population.copy()
-#         sor = sorted(pop.keys(), key=lambda x: pop[x])
-#         sor.reverse()
-#         ranks = {}
-#         current = 0
-#         for i in range(1,len(sor)-1):
-#             ranks[(current,current+ i)] = sor[i]
-#             current+= i
-#         num = random.randint(0, math.floor(current))
-       
-#         for ran in ranks:
-#             if num >= ran[0] and num <= ran[1]:
-#                 return ranks[ran]
-           
-#         return sor[0]
-   
-#     def tournament(population,size):
-#         participants = {}
-#         for i in range(size):
-#             p = random.choice(list(population.keys()))
-#             participants[p] = population[p]
-           
-#         min = math.inf
-#         winner = p
-#         for i in participants:
-#             if participants[i] < min:
-#                 min = participants[i]
-#                 winner = i
-#         return winner
-   
-#     sols = list(population.keys())
-#     def truncation(population,sols):
-       
-       
-#         winner = sols[0]
-#         min = math.inf
-#         for i in population.values():
-#             if population[i] < min:
-#                 min = population[i]
-#                 winner = i
-#         return winner
-   
-#     def random_selection(population):
-#         return random.choice(list(population.keys()))
-   
- 
- 
- 
- 
- 
- 
- 
- 
- 
-#     # selection schemes for parents selection
-#     def create_offsprings_fitness_proportional(population,offsprings,mutation):
-#         sum = 0
-#         for ind in population:
-#             sum += 1/population[ind]
-#         wheel = {}
-#         current = 0
-#         for i in population:
-#             per = math.floor(100 * ((1/population[i])/sum))
-#             wheel[(current,current+per)] = i
-#             current+=per
-#         # print(wheel)
-           
-       
-#         for o in range(offsprings):
-           
-#             num = random.randint(0, math.floor(current))
-           
-#             for ran in wheel:
-#                 if num >= ran[0] and num <= ran[1]:
-#                     parent_1 = wheel[ran]
-                   
-#             num = random.randint(0, math.floor(current))
-           
-#             for ran in wheel:
-#                 if num >= ran[0] and num <= ran[1]:
-#                     parent_2 = wheel[ran]
-           
-#             if mutation == 1:                    
-#                 child =  swap_mutation(crossover(parent_1, parent_2))
-               
-#         return population
-   
-#     def create_offsprings_ranked(population,size,offsprings,mutation,fitness):
-#         pop = population.copy()
-#         sor = sorted(pop.keys(), key=lambda x: pop[x])
-#         sor.reverse()
-       
-#         ranks = {}
-#         current = 0
-#         for i in range(len(sor)):
-#             ranks[(current,current+ i+1)] = sor[i]
-#             current+= i
-       
-       
-#         for o in range(offsprings):
-#             num = random.randint(0, math.floor(current))
-           
-#             parent_1 = list(population.keys())[0]
-#             parent_2 = list(population.keys())[0]
-#             for ran in ranks:
-#                 if num >= ran[0] and num <= ran[1]:
-#                     parent_1 = ranks[ran]
-#                     # print(parent_1)
-#                     break
-                   
-#             num = random.randint(0, math.floor(current))
-       
-#             for ran in ranks:
-#                 if num >= ran[0] and num <= ran[1]:
-#                     parent_2 = ranks[ran]
-#                     break
-               
-#             if mutation == 1:                    
-#                 child =  swap_mutation(crossover(parent_1, parent_2))
- 
-#             population[child] = fitness[child]
-               
-#         return population
-   
-#     def create_offsprings_tournament(population,size,offsprings,mutation,fitness):
-#         for o in range( offsprings):
-#             parent_1 =  tournament(size)
-#             parent_2 =  tournament(size)
-           
-#             if mutation == 1:                    
-#                 child = swap_mutation(crossover(parent_1, parent_2))
-#             population[child] = fitness[child]
-               
-#         return population
-   
-#     def create_offsprings_truncation(population,offsprings,mutation,fitness):
-#         arr = list(population.keys()).copy()
-#         for o in range(offsprings):
-#             parent_1 = truncation(arr)
-#             arr.remove(parent_1)
-#             parent_2 = truncation(arr)
-           
-#             if mutation == 1:                    
-#                 child =  swap_mutation(crossover(parent_1, parent_2))
-#             population[child] = fitness[child]
-               
-#         return population
-   
-#     def create_offsprings_random_selection(population,offsprings,mutation,fitness):
-#         for o in range(offsprings):
-#             parent_1 =  random_selection()
-#             parent_2 =  random_selection()
-           
-#             if mutation == 1:                    
-#                 child =  swap_mutation(crossover(parent_1, parent_2))
-#             population[child] = fitness[child]
-               
-#         return population
+    def initialize_population(self,file_path):
+        result_dict = {}
+        first_line_tuples = None
+    
+        with open(file_path, 'r') as file:
+            first_line_skipped = False
+
+            for line in file:
+                if not first_line_skipped:
+                    values = line.strip().split()  
+                    first_line_tuples = [(int(values[i]), int(values[i+1])) for i in range(0, len(values)-1, 2)]
+
+                    first_line_skipped = True
+                    continue
+                
+                values = line.strip().split()  
+                tuples = [(int(values[i]), int(values[i+1])) for i in range(0, len(values)-1, 2)]
+                result_dict[len(result_dict)] = tuples
+    
+
+        x = first_line_tuples
+        jsspdata = result_dict
+    
+        if x is not None:
+            no_of_jobs = x[0][0]
+            no_of_machines = x[0][1]
+
+        population = {}
+    
+        for i in range(self.size):
+        
+            operations = []
+            machines_current_times = []
+            for i in range(no_of_jobs):
+                operations.append(0)
+            # print(operations)
+            for i in range(no_of_machines):
+                machines_current_times.append(0)
+    
+            # print(machines_current_times)
+    
+            Machines_operating_times = []
+    
+            for i in range(no_of_machines):
+                Machines_operating_times.append([])
+            prev_operations_time = []
+            for i in range(no_of_machines):
+                prev_operations_time.append(0)
+    
+            completed_jobs = 0
+    
+            while (completed_jobs<no_of_jobs):
+                job = random.randint(0,no_of_jobs-1)
+    
+                while operations[job] == no_of_machines:
+                    job = random.randint(0,no_of_jobs-1)
+    
+                operation = operations[job]
+                curr_job = jsspdata[job]
+                machine_num = curr_job[operation][0]
+                time_for_operation = curr_job[operation][1]
+                start_time = max(prev_operations_time[job],machines_current_times[job])
+                end_time = start_time + time_for_operation
+                machines_current_times[machine_num] = end_time
+                prev_operations_time[job] = end_time
+    
+                operations[job]+=1
+                if operations[job] == no_of_machines:
+                    completed_jobs += 1
+    
+                Machines_operating_times[machine_num].append((job,operation,start_time,end_time))
+            Machines_operating_times_tuple = []
+            for i in Machines_operating_times:
+                Machines_operating_times_tuple.append(tuple(i))
+
+            Machines_operating_times=tuple(Machines_operating_times_tuple)
+
+            population[tuple(Machines_operating_times)] = self.compute_fitness(Machines_operating_times)
+            self.population = population
+        return population
+
+    def crossover(self, p1, p2):
+        parent_1 = list(p1)
+        parent_2 = list(p2)
+        ind = []
+        start = random.randint(0, (len(parent_1)//2)-1)
+        
+        for i in range(len(parent_1)//2):
+            ind.append(parent_1[i+start])
+            
+        for j in range(len(parent_2)):
+            if parent_2[j] not in ind:
+                ind.append(parent_2[j])
+        
+        return tuple(ind)
+    
+    # selection schemes
+    def fitness_proportional(self):
+        
+        total_weight = 0
+        for ind in self.population:
+            total_weight += 1/self.population[ind]
+            
+        individuals =  list(self.population.keys())
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
+        win = choice(c, 1, p=relative_fitness)
+
+        return individuals[win[0]]
+    
+    
+    def ranked(self):
+        
+        pop = self.population.copy()
+        sor = sorted(pop.keys(), key=lambda x: pop[x])
+        sor.reverse()
+        
+        individuals =  list(self.population.keys())
+        
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [i/total_weight for i in c]
+        
+        win = choice(c, 1, p=relative_fitness)
+
+        return individuals[win[0]]
+        # pop = self.population.copy()
+        # sor = sorted(pop.keys(), key=lambda x: pop[x])
+        # sor.reverse()
+        
+        # ranks = {}
+        # current = 0
+        # for i in range(1,len(sor)-1):
+        #     ranks[(current,current+ i)] = sor[i]
+        #     current+= i
+        # num = random.randint(0, math.floor(current))
+        
+        # for ran in ranks:
+        #     if num >= ran[0] and num <= ran[1]:
+        #         return ranks[ran]
+            
+        # return sor[0]
+    
+    def tournament(self, size):
+        participants = {}
+        for i in range(size):
+            p = random.choice(list(self.population.keys()))
+            participants[p] = self.population[p]
+            
+        min = math.inf
+        winner = p
+        for i in participants:
+            if participants[i] < min:
+                min = participants[i]
+                winner = i
+        return winner
+    
+    def truncation(self,sols):
+        winner = sols[0]
+        min = math.inf
+        for i in sols:
+            if self.population[i] < min:
+                min = self.population[i]
+                winner = i
+        return winner
+    
+    def random_selection(self):
+        return random.choice(list(self.population.keys()))
+    
+    
+    
+    # selection schemes for parents selection 
+    def create_offsprings_fitness_proportional(self):
+            
+        total_weight = 0
+        for ind in self.population:
+            total_weight += 1/self.population[ind]
+            
+        individuals =  list(self.population.keys())
+                
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
+        # print(relative_fitness)
+        for o in range(self.offsprings):
+            
+            win = choice(c, 1, p=relative_fitness)
+            parent_1 = individuals[win[0]]
+            win = choice(c, 1, p=relative_fitness)
+            parent_2 = individuals[win[0]]
+            
+            if self.mutation == 1:                    
+                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
+            else:
+                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            self.population[child] = self.compute_fitness(child)
+                
+        return self.population
+    
+    def create_offsprings_ranked(self):
+        pop = self.population.copy()
+        sor = sorted(pop.keys(), key=lambda x: pop[x])
+        sor.reverse()
+        
+        # ranks = {}
+        # current = 0
+        # for i in range(len(sor)):
+        #     ranks[(current,current+ i+1)] = sor[i]
+        #     current+= i
+        
+        individuals =  list(self.population.keys())
+        
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness = [(i+1)/total_weight for i in c]
+        
+        
+        for o in range(self.offsprings):
+            
+            win = choice(c, 1, p=relative_fitness)
+            parent_1 = individuals[win[0]]
+            
+            win = choice(c, 1, p=relative_fitness)
+            parent_2 = individuals[win[0]]
+            # num = random.randint(0, math.floor(current))
+            
+            # parent_1 = list(self.population.keys())[0]
+            # parent_2 = list(self.population.keys())[0]
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         parent_1 = ranks[ran]
+            #         # print(parent_1)
+            #         break
+                    
+            # num = random.randint(0, math.floor(current))
+        
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         parent_2 = ranks[ran]
+            #         break
+                
+            if self.mutation == 1:                    
+                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
+            else:
+                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            self.population[child] = self.compute_fitness(child)
+                
+        return self.population
+    
+    def create_offsprings_tournament(self, size):
+        for o in range(self.offsprings):
+            parent_1 = self.tournament(size)
+            parent_2 = self.tournament(size)
+            
+            if self.mutation == 1:                    
+                child = self.swap_mutation(self.crossover(parent_1, parent_2))
+            else:
+                child = self.insert_mutation(self.crossover(parent_1, parent_2))
+            self.population[child] = self.compute_fitness(child)
+                
+        return self.population
+    
+    def create_offsprings_truncation(self):
+        arr = list(self.population.keys()).copy()
+        for o in range(self.offsprings):
+            parent_1 = self.truncation(arr)
+            arr.remove(parent_1)
+            parent_2 = self.truncation(arr)
+            
+            if self.mutation == 1:                    
+                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
+            else:
+                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            self.population[child] = self.compute_fitness(child)
+                
+        return self.population
+    
+    def create_offsprings_random_selection(self):
+        for o in range(self.offsprings):
+            parent_1 = self.random_selection()
+            parent_2 = self.random_selection()
+            
+            if self.mutation == 1:                    
+                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
+            else:
+                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            self.population[child] = self.compute_fitness(child)
+                
+        return self.population
+
+
+    # selection schemes for surviver selection
+    def survivers_fitness_proportional(self):
+        # sum = 0
+        # for ind in self.population:
+        #     sum += 1/self.population[ind]
+        # wheel = {}
+        # current = 0
+        # for i in self.population:
+        #     per = math.floor(100 * ((1/self.population[i])/sum))
+        #     wheel[(current,current+per)] = i
+        #     current+=per
+        # print(wheel)
+        
+        total_weight = 0
+        for ind in self.population:
+            total_weight += 1/self.population[ind]
+            
+        individuals =  list(self.population.keys())
+        
+        # relative_fitness = [(1/self.population[i])/total_weight for i in individuals]
+            
+        # num = random.randint(0, math.floor(current))
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness= [(1/self.population[i])/total_weight for i in individuals]
+        
+        win = choice(c, 1, p=relative_fitness)
+
+        
+        new = {}
+        
+        for s in range(self.generation):
+            
+            win = choice(c, 1, p=relative_fitness)
+            
+            sur = individuals[win[0]]
+            new[sur] = self.population[sur]
+            # for ran in wheel:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         new[wheel[ran]] = self.population[wheel[ran]]
+        
+        self.population = new
+        return self.population
+    
+    def survivers_ranked(self):
+        pop = self.population.copy()
+        sor = sorted(pop.keys(), key=lambda x: pop[x])
+        sor.reverse()
+        
+        # ranks = {}
+        # current = 0
+        # for i in range(len(sor)):
+        #     ranks[(current,current+ i+1)] = sor[i]
+        #     current+= i
+        # num = random.randint(0, math.floor(current))
+        
+        individuals =  list(self.population.keys())
+        
+        n = len(individuals)
+        total_weight = (n*(n+1))/2
+        
+        
+        c = []
+        for i in range(len(individuals)):
+            c.append(i)
+        
+        relative_fitness = [(i+1)/total_weight for i in c]
+        
+        new = {}
+        
+        for s in range(self.generation):
+            
+            win = choice(c, 1, p=relative_fitness)
+            
+            sur = individuals[win[0]]
+            new[sur] = self.population[sur]
+            # win = choice(c, 1, p=relative_fitness)
+            # parent_1 = individuals[win[0]]
+        
+            # for ran in ranks:
+            #     if num >= ran[0] and num <= ran[1]:
+            #         new[ranks[ran]] = self.population[ranks[ran]]
+        
+        self.population = new
+        return self.population
+    
+    def survivers_tournament(self, size):
+        new = {}
+        
+        for s in range(self.generation):
+            
+            survivor = self.tournament(size)
+            new[survivor] = self.population[survivor]
+        
+        self.population = new
+        return self.population
+    
+    def survivers_truncation(self):
+        new = {}
+        arr = list(self.population.keys()).copy()
+        if len(arr) == self.generation:
+            return self.population
+        for s in range(self.size):
+            survivor = self.truncation(arr)
+            arr.remove(survivor)
+            new[survivor] = self.population[survivor]
+        
+        self.population = new
+        return self.population
+    
+    def survivers_random_selection(self):
+        new = {}
+        
+        for s in range(self.generation):
+            
+            survivor = self.random_selection()
+            new[survivor] = self.population[survivor]
+        
+        self.population = new
+        return self.population
+    
+    
+    # mutation schemes
+    def swap_mutation(self,individual):
+        r = random.randint(0,100)
+        num = 100 * self.mutation_rate
+        mutated = list(individual)
+        m = False
+        if r <= num:
+            i = random.randint(0,len(mutated)-1)
+            j = random.randint(0,len(mutated)-1)
+            temp = mutated[i]
+            mutated[i] = mutated[j]
+            mutated[j] = temp
+            m = True
+
+        individual = tuple(mutated)
+        return individual
+    
+    def insert_mutation(self,individual):
+        r = random.randint(0,100)
+        num = 100 * self.mutation_rate
+        mutated = list(individual)
+        if r <= num:
+            i = random.randint(0,len(mutated)-1)
+            j = random.randint(0,len(mutated)-1)
+            city = mutated[i]
+            mutated.remove(city)
+            mutated.insert(j,city)
+            
+        return tuple(mutated)
+    
+    
+    def best(self):
+        winner = list(self.population.keys())[0]
+        min = math.inf
+        for i in self.population:
+            if self.population[i] < min:
+                min = self.population[i]
+                winner = i
+        
+        print(winner)
+        print(min)
+        return winner,min
+    
+    
+    def tsp_brute_force(self):
+        arr = self.cities.copy()
+        
+        sols = permutation(arr)
+        
+        min_fit = math.inf
+        best = sols[0]
+        for i in sols:
+            fitness = self.compute_fitness(i)
+            if fitness <= min_fit:
+                min_fit = fitness
+                best = i
+                
+        print(best,":",min_fit)
+        return best,min_fit
+    
+    def evolution(self):
+        self.initialize_population('abz5.txt')
+        for g in range(self.generation):
+            print(g)
+            # print(self.population)
+            
+            # best_ind = self.truncation()
+            # best_score = self.population[best_ind]
+        
+            # print(best_ind)
+            # print(best_score)
+            if self.parent_scheme == 1:
+                self.create_offsprings_fitness_proportional()
+            elif self.parent_scheme == 2:
+                self.create_offsprings_ranked()
+            elif self.parent_scheme == 3:
+                self.create_offsprings_tournament(self.tournament_size)
+            elif self.parent_scheme == 4:
+                self.create_offsprings_truncation()
+            else:
+                self.create_offsprings_random_selection()
+            
+
+            if self.parent_scheme == 1:
+                self.survivers_fitness_proportional()
+            elif self.parent_scheme == 2:
+                self.survivers_ranked()
+            elif self.parent_scheme == 3:
+                self.survivers_tournament(self.tournament_size)
+            elif self.parent_scheme == 4:
+                self.survivers_truncation()
+            else:
+                self.survivers_random_selection()
+            # for o in range(self.offsprings):
+            #     parent_1 = self.ranked()
+            #     parent_2 = self.fitness_proportional()
+            #     child =  self.crossover(parent_1, parent_2)
+            #     self.population[child] = self.compute_fitness(child)
+            
+            # new = {}
+            # for t in range(self.size):
+            #     surviver = self.truncation()
+            #     new[surviver] = self.population[surviver]
+            # self.population = new
+            
+        self.best()
+        
+    def test(self,k):
+        fitprop = [[0]*k]*40
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_fitness_proportional()
+
+                self.survivers_fitness_proportional()
+                
+
+            
+            
+            
+                
+
+        
+# size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1
+    
+        
+Test = EA(size = 100, generations = 500, offsprings =  10, rate = 0.5, mutation = 1, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+# Test.get_data("qa194.tsp")
+Test.evolution()
+
+# # test.get_data("test.tsp")
+# # test.tsp_brute_force()
+# Test.evolution()
+
+# current = 100
+# num = random.randint(0, math.floor(current))
+# print(num)
+# num = random.randint(0, math.floor(current))
+# print(num)
+# num = random.randint(0, math.floor(current))
+# print(num)
+
+# evol = EA(size = 5)
+# evol.get_data("qa194.tsp")
+# # print(evol.data)
+# evol.initialize_population()
+# for i in evol.population:
+#     print(i)
+# print(evol.population)
+# pop = {(1):2,(2):5,(3):4,(4):7,(5):6}
+
+# sor = sorted(pop.keys(), key=lambda x: pop[x])
+# print(sor)
+
+# l = [[0]*10]*10
+# print(l)
