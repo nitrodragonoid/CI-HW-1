@@ -5,7 +5,8 @@
 # importing PIL
 from PIL import Image
 from numpy.random import choice   
-
+import matplotlib.pyplot as plt
+import numpy as np
 # Read image
 # img = Image.open('mona_lisa.jpg')
  
@@ -139,6 +140,7 @@ class EA:
         return total/(self.width*self.height)              
     
     def initialize_population(self):
+        self.population = {}
         for i in range(self.size):
             ind = []
             for j in range(50):
@@ -576,8 +578,8 @@ class EA:
                 min = self.population[i]
                 winner = i
         
-        print(winner)
-        print(min)
+        # print(winner)
+        # print(min)
         
         self.show_image(winner)
         
@@ -621,15 +623,184 @@ class EA:
             
             
         self.best()
+        winner, min = self.best()
+        print(winner)
+        print(min)
+        
+    def test(self,k):
+        l = k+1
+        fitprop = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            fitprop.append(r)
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_fitness_proportional()
+
+                self.survivers_fitness_proportional()
+                
+                b = self.best()[1]
+                fitprop[g][i] = b
+                fitprop[g][k] += b
+        fitprop[g][k] = fitprop[g][k]/k
+        
+        fitprop_x = []
+        y = []
+        for i in range(self.generation):
+            y.append(i+1)
+            fitprop_x.append(fitprop[i][k])
+            
+            
+        ranked = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            ranked.append(r)
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_ranked()
+
+                self.survivers_ranked()
+                
+                b = self.best()[1]
+                ranked[g][i] = b
+                ranked[g][k] += b
+        ranked[g][k] = ranked[g][k]/k
+        
+        ranked_x = []
+        for i in range(self.generation):
+            ranked_x.append(ranked[i][k])
+            
+            
+            
+        tournament = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            tournament.append(r)
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_tournament(self.tournament_size)
+
+                self.survivers_tournament(self.tournament_size)
+                
+                b = self.best()[1]
+                tournament[g][i] = b
+                tournament[g][k] += b
+        tournament[g][k] = tournament[g][k]/k
+        
+        tournament_x = []
+        for i in range(self.generation):
+            tournament_x.append(tournament[i][k])
+            
+            
+            
+        truncation = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            truncation.append(r)
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_truncation()
+
+                self.survivers_truncation()
+                
+                b = self.best()[1]
+                truncation[g][i] = b
+                truncation[g][k] += b
+        truncation[g][k] = truncation[g][k]/k
+        
+        truncation_x = []
+        for i in range(self.generation):
+            truncation_x.append(truncation[i][k])
+            
+            
+            
+        random = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            random.append(r)
+        
+        for i in range(k):
+            self.initialize_population()
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_random_selection()
+
+                self.survivers_random_selection()
+                
+                b = self.best()[1]
+                random[g][i] = b
+                random[g][k] += b
+        random[g][k] = random[g][k]/k
+        
+        random_x = []
+        for i in range(self.generation):
+            random_x.append(random[i][k])
+        
+        print("Fittness propotional table")
+        for i in range(len(random)):
+            print(fitprop[i])
+        print("Ranked table")
+        for i in range(len(random)):
+            print(ranked[i])
+        print("Tournament table")
+        for i in range(len(random)):
+            print(tournament[i])
+        print("Truncation table")
+        for i in range(len(random)):
+            print(truncation[i])
+        print("Random table")
+        for i in range(len(random)):
+            print(random[i])    
+        
+        # print(truncation_x)
+        ypoints_1 = np.array(fitprop_x)
+        ypoints_2 = np.array(ranked_x)
+        ypoints_3 = np.array(tournament_x)
+        ypoints_4 = np.array(truncation_x)
+        ypoints_5 = np.array(random_x)
+        xpoints = np.array(y)
+        
+        # plt.plot(X, y, color='r', label='sin') 
+        # plt.plot(X, z, color='g', label='cos')
+
+        plt.plot(xpoints, ypoints_1, color='r', label='fitness proportional')
+        plt.plot(xpoints, ypoints_2, color='b', label='ranked')
+        plt.plot(xpoints, ypoints_3, color='g', label='tournament')
+        plt.plot(xpoints, ypoints_4, color='y', label='truncation')
+        plt.plot(xpoints, ypoints_5, color='k', label='random')
+        plt.show()
         
 
-test = EA(size = 100, generations = 500, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+Test = EA(size = 100, generations = 40, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
 
 # test.get_data("mona_lisa.jpg")
-test.get_data("mona_lisa_smol.jpg")
+Test.get_data("mona_lisa_smol.jpg")
 
 
-test.evolution()
+# Test.evolution()
+Test.test(5)
 
 # l = ((((320, 883), (435, 612), (30, 835)), (86, 1, 97), 0.4), (((89, 889), (339, 249), (379, 901)), (51, 102, 233), 0.4), (((605, 659), (245, 548), (280, 97)), (139, 158, 63), 0.4), (((426, 45), (41, 144), (382, 717)), (128, 73, 191), 0.4), (((562, 822), (633, 56), (456, 241)), (85, 118, 247), 0.4), (((629, 286), (156, 540), (100, 203)), (26, 202, 139), 0.4), (((347, 733), (32, 729), (61, 13)), (1, 235, 189), 0.4), (((149, 922), (558, 155), (555, 92)), (71, 72, 144), 0.4), (((549, 773), (540, 297), (92, 814)), (14, 62, 192), 0.4), (((308, 409), (154, 61), (346, 871)), (69, 109, 165), 0.4), (((613, 525), (168, 584), (207, 755)), (101, 165, 180), 0.4), (((513, 842), (607, 886), (28, 128)), (58, 248, 40), 0.4), (((534, 871), (222, 861), (252, 741)), (107, 28, 246), 0.4), (((34, 63), (90, 7), (367, 670)), (100, 178, 1), 0.4), (((465, 77), (247, 891), (169, 23)), (47, 248, 174), 0.4), (((363, 874), (379, 558), (18, 944)), (3, 103, 172), 0.4), (((495, 532), (208, 499), (362, 287)), (70, 230, 229), 0.4), (((434, 704), (448, 234), (208, 466)), (164, 98, 208), 0.4), (((636, 202), (451, 873), (84, 675)), (111, 182, 42), 0.4), (((188, 694), (325, 160), (493, 622)), (102, 141, 186), 0.4), (((265, 774), (474, 15), (17, 821)), (150, 23, 46), 0.4), (((137, 84), (187, 886), (371, 681)), (198, 177, 78), 0.4), (((150, 708), (469, 678), (50, 413)), (161, 74, 74), 0.4), (((179, 712), (132, 11), (169, 29)), (158, 44, 107), 0.4), (((504, 327), (245, 279), (252, 399)), (32, 249, 89), 0.4), (((498, 761), (584, 414), (56, 433)), (118, 250, 206), 0.4), (((261, 134), (227, 169), (384, 68)), (193, 10, 184), 0.4), (((326, 120), (401, 419), (383, 484)), (153, 19, 232), 0.4), (((212, 698), (95, 425), (422, 794)), (86, 120, 28), 0.4), (((163, 812), (287, 122), (496, 64)), (254, 167, 13), 0.4), (((21, 612), (520, 94), (42, 631)), (248, 85, 212), 0.4), (((135, 367), (582, 942), (272, 186)), (193, 58, 212), 0.4), (((434, 36), (162, 689), (527, 112)), (84, 193, 49), 0.4), (((491, 740), (464, 583), (173, 397)), (243, 44, 196), 0.4), (((555, 785), (11, 917), (364, 451)), (136, 4, 253), 0.4), (((230, 336), (620, 265), (534, 429)), (93, 22, 230), 0.4), (((123, 695), (151, 857), (8, 467)), (26, 181, 47), 0.4), (((4, 921), (620, 380), (520, 896)), (90, 182, 53), 0.4), (((4, 189), (285, 182), (58, 792)), (61, 166, 163), 0.4), (((152, 878), (450, 565), (414, 759)), (25, 11, 238), 0.4), (((179, 163), (635, 196), (509, 745)), (65, 81, 108), 0.4), (((367, 826), (550, 551), (472, 773)), (55, 51, 197), 0.4), (((425, 309), (252, 354), (32, 761)), (222, 139, 79), 0.4), (((386, 865), (469, 759), (234, 535)), (173, 60, 255), 0.4), (((174, 307), (464, 811), (597, 720)), (0, 187, 74), 0.4), (((20, 369), (556, 659), (338, 103)), (251, 128, 247), 0.4), (((406, 251), (398, 357), (334, 894)), (22, 206, 1), 0.4), (((192, 91), (357, 759), (326, 682)), (96, 32, 66), 0.4), (((69, 487), (50, 199), (400, 866)), (89, 40, 241), 0.4), (((260, 214), (592, 622), (623, 706)), (70, 1, 251), 0.4))
 

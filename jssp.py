@@ -68,6 +68,7 @@ class EA:
         return y
 
     def initialize_population(self,file_path):
+        self.population = {}
         result_dict = {}
         first_line_tuples = None
     
@@ -542,8 +543,8 @@ class EA:
                 min = self.population[i]
                 winner = i
         
-        print(winner)
-        print(min)
+        # print(winner)
+        # print(min)
         return winner,min
     
     
@@ -609,17 +610,174 @@ class EA:
             # self.population = new
             
         self.best()
+        winner, min = self.best()
+        print(winner)
+        print(min)
         
     def test(self,k):
-        fitprop = [[0]*k]*40
+        l = k+1
+        fitprop = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            fitprop.append(r)
         
         for i in range(k):
-            self.initialize_population()
+            self.initialize_population('abz5.txt')
             for g in range(self.generation):
             # print(g)
                 self.create_offsprings_fitness_proportional()
 
                 self.survivers_fitness_proportional()
+                
+                b = self.best()[1]
+                fitprop[g][i] = b
+                fitprop[g][k] += b
+        fitprop[g][k] = fitprop[g][k]/k
+        
+        fitprop_x = []
+        y = []
+        for i in range(self.generation):
+            y.append(i+1)
+            fitprop_x.append(fitprop[i][k])
+            
+            
+        ranked = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            ranked.append(r)
+        
+        for i in range(k):
+            self.initialize_population('abz5.txt')
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_ranked()
+
+                self.survivers_ranked()
+                
+                b = self.best()[1]
+                ranked[g][i] = b
+                ranked[g][k] += b
+        ranked[g][k] = ranked[g][k]/k
+        
+        ranked_x = []
+        for i in range(self.generation):
+            ranked_x.append(ranked[i][k])
+            
+            
+            
+        tournament = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            tournament.append(r)
+        
+        for i in range(k):
+            self.initialize_population('abz5.txt')
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_tournament(self.tournament_size)
+
+                self.survivers_tournament(self.tournament_size)
+                
+                b = self.best()[1]
+                tournament[g][i] = b
+                tournament[g][k] += b
+        tournament[g][k] = tournament[g][k]/k
+        
+        tournament_x = []
+        for i in range(self.generation):
+            tournament_x.append(tournament[i][k])
+            
+            
+            
+        truncation = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            truncation.append(r)
+        
+        for i in range(k):
+            self.initialize_population('abz5.txt')
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_truncation()
+
+                self.survivers_truncation()
+                
+                b = self.best()[1]
+                truncation[g][i] = b
+                truncation[g][k] += b
+        truncation[g][k] = truncation[g][k]/k
+        
+        truncation_x = []
+        for i in range(self.generation):
+            truncation_x.append(truncation[i][k])
+            
+            
+            
+        random = []
+        for i in range(self.generation):
+            r = []
+            for j in range(k+1):
+                r.append(0)
+            random.append(r)
+        
+        for i in range(k):
+            self.initialize_population('abz5.txt')
+            for g in range(self.generation):
+            # print(g)
+                self.create_offsprings_random_selection()
+
+                self.survivers_random_selection()
+                
+                b = self.best()[1]
+                random[g][i] = b
+                random[g][k] += b
+        random[g][k] = random[g][k]/k
+        
+        random_x = []
+        for i in range(self.generation):
+            random_x.append(random[i][k])
+        
+        print("Fittness propotional table")
+        for i in range(len(random)):
+            print(fitprop[i])
+        print("Ranked table")
+        for i in range(len(random)):
+            print(ranked[i])
+        print("Tournament table")
+        for i in range(len(random)):
+            print(tournament[i])
+        print("Truncation table")
+        for i in range(len(random)):
+            print(truncation[i])
+        print("Random table")
+        for i in range(len(random)):
+            print(random[i])    
+        
+        # print(truncation_x)
+        ypoints_1 = np.array(fitprop_x)
+        ypoints_2 = np.array(ranked_x)
+        ypoints_3 = np.array(tournament_x)
+        ypoints_4 = np.array(truncation_x)
+        ypoints_5 = np.array(random_x)
+        xpoints = np.array(y)
+        
+        # plt.plot(X, y, color='r', label='sin') 
+        # plt.plot(X, z, color='g', label='cos')
+
+        plt.plot(xpoints, ypoints_1, color='r', label='fitness proportional')
+        plt.plot(xpoints, ypoints_2, color='b', label='ranked')
+        plt.plot(xpoints, ypoints_3, color='g', label='tournament')
+        plt.plot(xpoints, ypoints_4, color='y', label='truncation')
+        plt.plot(xpoints, ypoints_5, color='k', label='random')
+        plt.show()
                 
 
             
@@ -631,9 +789,10 @@ class EA:
 # size = 30, generations = 50 , offsprings =  10, rate = 0.5, iteration = 10, mutation = 1, parent_scheme = 1, surviver_scheme = 1
     
         
-Test = EA(size = 100, generations = 500, offsprings =  10, rate = 0.5, mutation = 1, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+Test = EA(size = 100, generations = 40, offsprings =  10, rate = 0.5, mutation = 1, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
 # Test.get_data("qa194.tsp")
-Test.evolution()
+# Test.evolution()
+Test.test(5)
 
 # # test.get_data("test.tsp")
 # # test.tsp_brute_force()
