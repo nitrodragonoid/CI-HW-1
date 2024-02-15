@@ -488,10 +488,8 @@ class EA:
                 if blue >255:
                     blue = 255
                     
-                # print(red,green,blue)
                 image_data.append((int(red),int(green),int(blue)))
                 
-        # print(image_data)
         img = Image.new("RGB", (self.width,self.height))
         img.putdata(image_data)
         
@@ -507,25 +505,16 @@ class EA:
             if self.population[i] < min:
                 min = self.population[i]
                 winner = i
-        
-        # print(winner)
-        # print(min)
                 
         return winner,min
         
     
     def evolution(self):
         self.initialize_population()
-        # print("here")
+
         for g in range(self.generation):
             print(g)
-            # print(self.population)
-            
-            # best_ind = self.truncation()
-            # best_score = self.population[best_ind]
-        
-            # print(best_ind)
-            # print(best_score)
+
             if self.parent_scheme == 1:
                 self.create_offsprings_fitness_proportional()
             elif self.parent_scheme == 2:
@@ -549,12 +538,15 @@ class EA:
             else:
                 self.survivers_random_selection()
             
+            winner, min = self.best()
+            if g%10 == 0:
+                self.show_image(winner)
             
-        self.best()
         winner, min = self.best()
         print(winner)
         print(min)
         self.show_image(winner)
+        
         
     def average_fitness(self):
         total = 0
