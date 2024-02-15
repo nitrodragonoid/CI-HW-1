@@ -295,7 +295,7 @@ class EA:
         #     ranks[(current,current+ i+1)] = sor[i]
         #     current+= i
         
-        individuals =  list(self.population.keys())
+        individuals = list(self.population.keys())
         
         n = len(individuals)
         total_weight = (n*(n+1))/2
@@ -305,8 +305,7 @@ class EA:
         for i in range(len(individuals)):
             c.append(i)
         
-        relative_fitness = [i/total_weight for i in c]
-        
+        relative_fitness = [(i+1)/total_weight for i in c]
         
         for o in range(self.offsprings):
             
@@ -315,23 +314,7 @@ class EA:
             
             win = choice(c, 1, p=relative_fitness)
             parent_2 = individuals[win[0]]
-            # num = random.randint(0, math.floor(current))
             
-            # parent_1 = list(self.population.keys())[0]
-            # parent_2 = list(self.population.keys())[0]
-            # for ran in ranks:
-            #     if num >= ran[0] and num <= ran[1]:
-            #         parent_1 = ranks[ran]
-            #         # print(parent_1)
-            #         break
-                    
-            # num = random.randint(0, math.floor(current))
-        
-            # for ran in ranks:
-            #     if num >= ran[0] and num <= ran[1]:
-            #         parent_2 = ranks[ran]
-            #         break
-                
             child =  self.mutation(self.crossover(parent_1, parent_2))
             self.population[child] = self.compute_fitness(child)
                 
@@ -890,7 +873,7 @@ class EA:
                 
 
 
-Test = EA(size = 30, generations = 40, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+Test = EA(size = 5, generations = 10, offsprings =  2, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
 
 # test.get_data("mona_lisa.jpg")
 Test.get_data("mona_lisa_smol.jpg")
