@@ -279,10 +279,7 @@ class EA:
             win = choice(c, 1, p=relative_fitness)
             parent_2 = individuals[win[0]]
             
-            if self.mutation == 1:                    
-                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
-            else:
-                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            child =  self.mutation(self.crossover(parent_1, parent_2))
             self.population[child] = self.compute_fitness(child)
                 
         return self.population
@@ -335,10 +332,7 @@ class EA:
             #         parent_2 = ranks[ran]
             #         break
                 
-            if self.mutation == 1:                    
-                child =  self.swap_mutation(self.crossover(parent_1, parent_2))
-            else:
-                child =  self.insert_mutation(self.crossover(parent_1, parent_2))
+            child =  self.mutation(self.crossover(parent_1, parent_2))
             self.population[child] = self.compute_fitness(child)
                 
         return self.population
@@ -580,9 +574,7 @@ class EA:
         
         # print(winner)
         # print(min)
-        
-        self.show_image(winner)
-        
+                
         return winner,min
         
     
@@ -626,6 +618,7 @@ class EA:
         winner, min = self.best()
         print(winner)
         print(min)
+        self.show_image(winner)
         
     def test(self,k):
         l = k+1
@@ -647,7 +640,9 @@ class EA:
                 b = self.best()[1]
                 fitprop[g][i] = b
                 fitprop[g][k] += b
-        fitprop[g][k] = fitprop[g][k]/k
+        self.show_image(b[0])
+        for g in range(self.generation):
+            fitprop[g][k] = fitprop[g][k]/k
         
         fitprop_x = []
         y = []
@@ -674,7 +669,9 @@ class EA:
                 b = self.best()[1]
                 ranked[g][i] = b
                 ranked[g][k] += b
-        ranked[g][k] = ranked[g][k]/k
+        self.show_image(b[0])
+        for g in range(self.generation):
+            ranked[g][k] = ranked[g][k]/k
         
         ranked_x = []
         for i in range(self.generation):
@@ -700,7 +697,10 @@ class EA:
                 b = self.best()[1]
                 tournament[g][i] = b
                 tournament[g][k] += b
-        tournament[g][k] = tournament[g][k]/k
+        
+        self.show_image(b[0])
+        for g in range(self.generation):
+            tournament[g][k] = tournament[g][k]/k
         
         tournament_x = []
         for i in range(self.generation):
@@ -726,7 +726,9 @@ class EA:
                 b = self.best()[1]
                 truncation[g][i] = b
                 truncation[g][k] += b
-        truncation[g][k] = truncation[g][k]/k
+        self.show_image(b[0])
+        for g in range(self.generation):
+            truncation[g][k] = truncation[g][k]/k
         
         truncation_x = []
         for i in range(self.generation):
@@ -752,7 +754,9 @@ class EA:
                 b = self.best()[1]
                 random[g][i] = b
                 random[g][k] += b
-        random[g][k] = random[g][k]/k
+        self.show_image(b[0])
+        for g in range(self.generation):
+            random[g][k] = random[g][k]/k
         
         random_x = []
         for i in range(self.generation):
@@ -793,7 +797,7 @@ class EA:
         plt.show()
         
 
-Test = EA(size = 100, generations = 40, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+Test = EA(size = 30, generations = 100, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
 
 # test.get_data("mona_lisa.jpg")
 Test.get_data("mona_lisa_smol.jpg")
