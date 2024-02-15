@@ -7,29 +7,7 @@ from PIL import Image
 from numpy.random import choice   
 import matplotlib.pyplot as plt
 import numpy as np
-# Read image
-# img = Image.open('mona_lisa.jpg')
- 
-# # Output Images
-# img.show()
- 
-# # prints format of image
-# print(img.format)
- 
-# # prints mode of image
-# print(img.mode)
-# # data = list(img.getdata())
-# # for i in data:
-# #     print("row",i)
-    
-    
-# pixels = list(img.getdata())
-# width, height = img.size
-# pixels = [pixels[i * width:(i + 1) * width] for i in range(height)]
 
-# for i in pixels:
-#     print("row",i)
-# print("data:",data)
 
 
 import random
@@ -164,7 +142,6 @@ class EA:
             print(i)
             individual = tuple(ind)
             self.population[individual] = self.compute_fitness(individual)
-            # print(self.population[tuple(ind)])
         return self.population
         
     def crossover(self, p1, p2):
@@ -356,26 +333,12 @@ class EA:
 
     # selection schemes for surviver selection
     def survivers_fitness_proportional(self):
-        # sum = 0
-        # for ind in self.population:
-        #     sum += 1/self.population[ind]
-        # wheel = {}
-        # current = 0
-        # for i in self.population:
-        #     per = math.floor(100 * ((1/self.population[i])/sum))
-        #     wheel[(current,current+per)] = i
-        #     current+=per
-        # print(wheel)
         
         total_weight = 0
         for ind in self.population:
             total_weight += 1/self.population[ind]
             
         individuals =  list(self.population.keys())
-        
-        # relative_fitness = [(1/self.population[i])/total_weight for i in individuals]
-            
-        # num = random.randint(0, math.floor(current))
         
         c = []
         for i in range(len(individuals)):
@@ -394,9 +357,6 @@ class EA:
             
             sur = individuals[win[0]]
             new[sur] = self.population[sur]
-            # for ran in wheel:
-            #     if num >= ran[0] and num <= ran[1]:
-            #         new[wheel[ran]] = self.population[wheel[ran]]
         
         self.population = new
         return self.population
@@ -406,12 +366,6 @@ class EA:
         sor = sorted(pop.keys(), key=lambda x: pop[x])
         sor.reverse()
         
-        # ranks = {}
-        # current = 0
-        # for i in range(len(sor)):
-        #     ranks[(current,current+ i+1)] = sor[i]
-        #     current+= i
-        # num = random.randint(0, math.floor(current))
         
         individuals =  list(self.population.keys())
         
@@ -423,7 +377,7 @@ class EA:
         for i in range(len(individuals)):
             c.append(i)
         
-        relative_fitness = [i/total_weight for i in c]
+        relative_fitness = [(i+1)/total_weight for i in c]
         
         new = {}
         
@@ -513,7 +467,6 @@ class EA:
     def show_image(self,ind):
         image_data = []
         
-        # print(self.width,self.height)
         for i in range(self.height):
             for j in range(self.width):
                 red = 0
