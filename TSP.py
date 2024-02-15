@@ -540,14 +540,25 @@ class EA:
         print(winner)
         print(min)
         
+    def average_fitness(self):
+        total = 0
+        for i in self.population:
+            total += self.population[i]
+        return total/self.size
+        
     def test(self,k):
         l = k+1
         fitprop = []
+        fitprop_average = []
         for i in range(self.generation):
             r = []
+            r1 = []
             for j in range(k+1):
                 r.append(0)
+                r1.append(0)
             fitprop.append(r)
+            fitprop_average.append(r1)
+        
         
         for i in range(k):
             self.initialize_population()
@@ -560,8 +571,13 @@ class EA:
                 b = self.best()[1]
                 fitprop[g][i] = b
                 fitprop[g][k] += b
+                
+                a = self.average_fitness()
+                fitprop_average[g][i] = a
+                fitprop_average[g][k] += a
         for g in range(self.generation):
             fitprop[g][k] = fitprop[g][k]/k
+            fitprop_average[g][k] = fitprop_average[g][k]/k
         
         fitprop_x = []
         y = []
@@ -571,11 +587,15 @@ class EA:
             
             
         ranked = []
+        ranked_average = []
         for i in range(self.generation):
             r = []
+            r1 = []
             for j in range(k+1):
                 r.append(0)
+                r1.append(0)
             ranked.append(r)
+            ranked_average.append(r1)
         
         for i in range(k):
             self.initialize_population()
@@ -588,21 +608,27 @@ class EA:
                 b = self.best()[1]
                 ranked[g][i] = b
                 ranked[g][k] += b
+                a = self.average_fitness()
+                ranked_average[g][i] = a
+                ranked_average[g][k] += a
         for g in range(self.generation):
             ranked[g][k] = ranked[g][k]/k
+            ranked_average[g][k] = ranked_average[g][k]/k
         
         ranked_x = []
         for i in range(self.generation):
             ranked_x.append(ranked[i][k])
             
-            
-            
         tournament = []
+        tournament_average = []
         for i in range(self.generation):
             r = []
+            r1 = []
             for j in range(k+1):
                 r.append(0)
+                r1.append(0)
             tournament.append(r)
+            tournament_average.append(r1)
         
         for i in range(k):
             self.initialize_population()
@@ -615,8 +641,13 @@ class EA:
                 b = self.best()[1]
                 tournament[g][i] = b
                 tournament[g][k] += b
+                
+                a = self.average_fitness()
+                tournament_average[g][i] = a
+                tournament_average[g][k] += a
         for g in range(self.generation):
             tournament[g][k] = tournament[g][k]/k
+            tournament_average[g][k] = tournament_average[g][k]/k
         
         tournament_x = []
         for i in range(self.generation):
@@ -625,11 +656,15 @@ class EA:
             
             
         truncation = []
+        truncation_average = []
         for i in range(self.generation):
             r = []
+            r1 = []
             for j in range(k+1):
                 r.append(0)
+                r1.append(0)
             truncation.append(r)
+            truncation_average.append(r1)
         
         for i in range(k):
             self.initialize_population()
@@ -642,8 +677,13 @@ class EA:
                 b = self.best()[1]
                 truncation[g][i] = b
                 truncation[g][k] += b
+                
+                a = self.average_fitness()
+                truncation_average[g][i] = a
+                truncation_average[g][k] += a
         for g in range(self.generation):
             truncation[g][k] = truncation[g][k]/k
+            truncation_average[g][k] = truncation_average[g][k]/k
         
         truncation_x = []
         for i in range(self.generation):
@@ -652,11 +692,15 @@ class EA:
             
             
         random = []
+        random_average = []
         for i in range(self.generation):
             r = []
+            r1 = []
             for j in range(k+1):
                 r.append(0)
+                r1.append(0)
             random.append(r)
+            random_average.append(r1)
         
         for i in range(k):
             self.initialize_population()
@@ -669,28 +713,61 @@ class EA:
                 b = self.best()[1]
                 random[g][i] = b
                 random[g][k] += b
+                
+                a = self.average_fitness()
+                random_average[g][i] = a
+                random_average[g][k] += a
         for g in range(self.generation):
             random[g][k] = random[g][k]/k
+            random_average[g][k] = random_average[g][k]/k
         
         random_x = []
         for i in range(self.generation):
             random_x.append(random[i][k])
         
-        print("Fittness propotional table")
+        print("Fitness propotional best fitness table")
         for i in range(len(random)):
             print(fitprop[i])
-        print("Ranked table")
+            
+        print("Fitness propotional average fitness table")
+        for i in range(len(random)):
+            print(fitprop_average[i])
+            
+            
+        print("Ranked best fitness table")
         for i in range(len(random)):
             print(ranked[i])
-        print("Tournament table")
+            
+        print("Ranked average fitness table")
+        for i in range(len(random)):
+            print(ranked_average[i])
+            
+            
+        print("Tournament best fitness table")
         for i in range(len(random)):
             print(tournament[i])
-        print("Truncation table")
+            
+        print("Tournament average fitness table")
+        for i in range(len(random)):
+            print(tournament_average[i])
+            
+            
+        print("Truncation best fitness table")
         for i in range(len(random)):
             print(truncation[i])
-        print("Random table")
+            
+        print("Truncation average fitness table")
         for i in range(len(random)):
-            print(random[i])    
+            print(truncation_average[i])
+            
+            
+        print("Random best fitness table")
+        for i in range(len(random)):
+            print(random[i])   
+            
+        print("Random average fitness table")
+        for i in range(len(random)):
+            print(random_average[i])    
         
         # print(truncation_x)
         ypoints_1 = np.array(fitprop_x)
