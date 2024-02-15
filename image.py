@@ -648,13 +648,17 @@ class EA:
 
                 self.survivers_fitness_proportional()
                 
-                b = self.best()[1]
+                win,b = self.best()
                 fitprop[g][i] = b
                 fitprop[g][k] += b
                 
                 a = self.average_fitness()
                 fitprop_average[g][i] = a
                 fitprop_average[g][k] += a
+                
+                if g%10 == 0:
+                    self.show_image(win)
+        self.show_image(win)
         for g in range(self.generation):
             fitprop[g][k] = fitprop[g][k]/k
             fitprop_average[g][k] = fitprop_average[g][k]/k
@@ -685,12 +689,17 @@ class EA:
 
                 self.survivers_ranked()
                 
-                b = self.best()[1]
+                win,b = self.best()
                 ranked[g][i] = b
                 ranked[g][k] += b
                 a = self.average_fitness()
                 ranked_average[g][i] = a
                 ranked_average[g][k] += a
+                
+                if g%10 == 0:
+                    self.show_image(win)
+        self.show_image(win)
+        
         for g in range(self.generation):
             ranked[g][k] = ranked[g][k]/k
             ranked_average[g][k] = ranked_average[g][k]/k
@@ -718,13 +727,17 @@ class EA:
 
                 self.survivers_tournament(self.tournament_size)
                 
-                b = self.best()[1]
+                win,b = self.best()
                 tournament[g][i] = b
                 tournament[g][k] += b
                 
                 a = self.average_fitness()
                 tournament_average[g][i] = a
                 tournament_average[g][k] += a
+                if g%10 == 0:
+                    self.show_image(win)
+        self.show_image(win)
+        
         for g in range(self.generation):
             tournament[g][k] = tournament[g][k]/k
             tournament_average[g][k] = tournament_average[g][k]/k
@@ -754,13 +767,17 @@ class EA:
 
                 self.survivers_truncation()
                 
-                b = self.best()[1]
+                win,b = self.best()
                 truncation[g][i] = b
                 truncation[g][k] += b
                 
                 a = self.average_fitness()
                 truncation_average[g][i] = a
                 truncation_average[g][k] += a
+                if g%10 == 0:
+                    self.show_image(win)
+        self.show_image(win)
+        
         for g in range(self.generation):
             truncation[g][k] = truncation[g][k]/k
             truncation_average[g][k] = truncation_average[g][k]/k
@@ -790,13 +807,17 @@ class EA:
 
                 self.survivers_random_selection()
                 
-                b = self.best()[1]
+                win,b = self.best()
                 random[g][i] = b
                 random[g][k] += b
                 
                 a = self.average_fitness()
                 random_average[g][i] = a
                 random_average[g][k] += a
+                if g%10 == 0:
+                    self.show_image(win)
+        self.show_image(win)
+        
         for g in range(self.generation):
             random[g][k] = random[g][k]/k
             random_average[g][k] = random_average[g][k]/k
@@ -869,7 +890,7 @@ class EA:
                 
 
 
-Test = EA(size = 30, generations = 100, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
+Test = EA(size = 30, generations = 40, offsprings =  20, rate = 0.5, parent_scheme = 4, surviver_scheme = 4, tournament_size= 10)
 
 # test.get_data("mona_lisa.jpg")
 Test.get_data("mona_lisa_smol.jpg")
